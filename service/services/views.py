@@ -5,5 +5,16 @@ from .serializers import SubscriptionSerializer
 
 # Create your views here.
 class SubscriptionView(ReadOnlyModelViewSet):
-    queryset = Subscription.objects.all().prefetch_related("client")
+    queryset = (
+        Subscription.objects.select_related("client__user", "plan")
+        .all()
+        .only(
+            "id",
+            "plan_id",
+            "client__company_name",
+            "client__user__email",
+            "plan__play_type",
+            "plan__discount_percent",
+        )
+    )
     serializer_class = SubscriptionSerializer
